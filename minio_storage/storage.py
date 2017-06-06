@@ -79,8 +79,16 @@ class MinioStorage(Storage):
             obj = self.client.get_object(self.bucket_name, name)
             return ContentFile(obj.read())
         except ResponseError as error:
-            logger.warn(error)
+            logger.warn(error + " for key " + name)
             raise IOError("File {} does not exist".format(name))
+        except NoSuchKey as error:
+            raise IOError(error.message + ' for key ' + name)
+        # Temporary - due to https://github.com/minio/minio-py/issues/514
+        except NoSuchBucket as error:
+             raise IOError(error.message + ' for bucket ' + self.bucket_name)
+        except Exception as error:
+             logger.warn(error)
+             raise IOError("Could not retrieve object {}".format(name))
 
     def _save(self, name, content):
         # (str, bytes) -> str
@@ -215,6 +223,14 @@ class MinioStorage(Storage):
             logger.warn(error)
             raise IOError(
                 "Could not access modification time for file {}".format(name))
+        except NoSuchKey as error:
+            raise IOError(error.message + ' for key ' + name)
+        # Temporary - due to https://github.com/minio/minio-py/issues/514
+        except NoSuchBucket as error:
+             raise IOError(error.message + ' for bucket ' + self.bucket_name)
+        except Exception as error:
+             logger.warn(error)
+             raise IOError("Could not retrieve object {}".format(name))
 
 
 @deconstructible
