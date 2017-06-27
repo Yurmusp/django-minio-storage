@@ -16,8 +16,8 @@ setup(
     url="https://github.com/tomhoule/django-minio-storage",
     packages=['minio_storage'],
     install_requires=[
-        "django>=1.9",
-        "minio>=1.0.2",
+        "django>=1.8",
+        "minio>=2.2.3",
     ],
     extras_require={
         "test": [
